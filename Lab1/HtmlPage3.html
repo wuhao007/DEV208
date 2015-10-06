@@ -1,0 +1,130 @@
+﻿<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+        body {
+            font-family: Verdana;
+        }
+
+        h1, h2, h3 {
+            color: darkblue;
+        }
+
+        .rating-circle {
+            height: 2em;
+            width: 2em;
+            border: .1em solid black;
+            border-radius: 1.1em;
+            display: inline-block;
+            margin: 0;
+            padding: .1em;
+        }
+
+        .rating-hover {
+            background-color: yellow;
+        }
+
+        .rating-chosen {
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Contoso Web Developer Conference</h1>
+    <h2>Finding elements using jQuery</h2>
+    <div>This session is about identifying elements using jQuery methods and selectors.</div>
+    <h3>Rate this session</h3>
+    <div id="rating-container" max-value="5"></div>
+
+    <div>
+        <label for="max-value">Enter max value:</label>
+        <input type="text" id="max-value" />
+        <button type="button" id="update-max-value">Update max value</button>
+    </div>
+
+    <script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
+
+    <script>
+        // your answer would go here
+        $(function () {
+            initRatings();
+
+            $('#update-max-value').click(function () {
+                updateMaxValue();
+            });
+        });
+
+        function updateMaxValue() {
+            // get max value
+            var maxValue = parseInt($("#max-value").val(), 10);
+
+            // check if max value is valid
+            if (isNaN(maxValue) || maxValue <= 0) {
+                alert('invalid max value');
+                return;
+            }
+            // update max value and reload circles
+            $('#rating-container').attr("max-value", maxValue);
+            initRatings();
+        }
+
+        function initRatings() {
+            // get maxValue attribute
+            var maxValue = $('#rating-container').attr("max-value");
+
+            // clear current circles
+            $('#rating-container').html('');
+
+            // draws cirlces
+            for (var i = 0; i < maxValue; i++) {
+                $('#rating-container').append('<div class="rating-circle"></div>');
+            }
+
+            // rebind circle events
+            // mouse over and click events
+            $('.rating-circle').each(function (i) {
+                $(this).mouseover(function () {
+                    highlight(i);
+                })
+                .mouseout(function () {
+                    unhighlight();
+                })
+                .click(function () {
+                    rating(i);
+                });
+            });
+        }
+
+        // highlight on mouse hover
+        function highlight(index) {
+            $('.rating-circle').each(function (i) {
+                if (i <= index) {
+                    $(this).addClass('rating-hover');
+                }
+                else {
+                    $(this).removeClass('rating-hover');
+                }
+            });
+        }
+
+        // unhighlight on mouse out
+        function unhighlight() {
+            $('.rating-circle').each(function () {
+                $(this).removeClass('rating-hover');
+            });
+        }
+
+        // rating on click
+        function rating(index) {
+            $('.rating-circle').each(function (i) {
+                if (i <= index) {
+                    $(this).addClass('rating-chosen');
+                }
+                else {
+                    $(this).removeClass('rating-chosen');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

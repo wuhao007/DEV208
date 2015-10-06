@@ -1,0 +1,107 @@
+﻿<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+        body {
+            font-family: Verdana;
+        }
+
+        h1, h2, h3 {
+            color: darkblue;
+        }
+
+        .rating-circle {
+            height: 2em;
+            width: 2em;
+            border: .1em solid black;
+            border-radius: 1.1em;
+            display: inline-block;
+            margin: 0;
+            padding: .1em;
+        }
+
+        .rating-hover {
+            background-color: yellow;
+        }
+
+        .rating-chosen {
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Contoso Web Developer Conference</h1>
+    <h2>Finding elements using jQuery</h2>
+    <div>This session is about identifying elements using jQuery methods and selectors.</div>
+    <h3>Rate this session</h3>
+    <div id="rating-container" max-value="5"></div>
+
+    <div>
+        <label for="max-value">Enter max value:</label>
+        <input type="text" id="max-value" />
+        <button type="button" id="update-max-value">Update max value</button>
+    </div>
+    <button type="button" id="save-rating">Save rating</button>
+    <div id="output"></div>
+
+    <script src="//ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.4.min.js"></script>
+
+    <script>
+        // your answer would go here
+        $(function () {
+            var index = -1;
+            var max_value = -1;
+
+            $('#save-rating').click(function () {
+                var results = { value: index + 1, maxValue: max_value };
+
+                $.post('http://jquery-edx.azurewebsites.net/api/Rating', results, function (data) {
+                    $('#output').text(data.message);
+                });
+            });
+
+            // After loading the page, show the number of circles the developer wants to show
+            show_circles($('#rating-container').attr('max-value'));
+
+            // When user enters the number of circles, change the number of circles on the screen
+            $('#update-max-value').click(function () {
+                show_circles($('#max-value').val());
+            });
+
+            // This function shows the number of circles on the screen, given by the parameter number_of_circles
+            function show_circles(number_of_circles) {
+                $('#rating-container').empty();
+                for (var counter = 1; counter <= number_of_circles; counter++) {
+                    $('#rating-container').append('<div class="rating-circle"></div>');
+                }
+                index = -1;
+                max_value = number_of_circles;
+            }
+
+            // When mouse enters, add class 'rating-hover' to appropiate circle(s) and remove 'rating-chosen' from all circles
+            $('#rating-container').delegate('.rating-circle', 'mouseenter', function () {
+                $(this).addClass('rating-hover');
+                $(this).prevAll().addClass('rating-hover');
+                $(this).nextAll().removeClass('rating-hover');
+                $('.rating-circle').removeClass('rating-chosen');
+            });
+
+            // When mouse leaves circles, remove class 'rating-hover' and add class 'rating-chosen' to selected circles
+            $('#rating-container').delegate('.rating-circle', 'mouseout', function () {
+                $('.rating-circle').removeClass('rating-hover');
+                for (var counter = 0; counter <= index; counter++) {
+                    $($('#rating-container').children(".rating-circle").get(counter)).addClass('rating-chosen');
+                }
+            });
+
+            // When mouse clicked, remember which one was clicked and add class 'rating-chosen' to appropiate circle(s)
+            $('#rating-container').delegate('.rating-circle', 'click', function () {
+                index = $(this).index();
+                $(this).addClass('rating-chosen');
+                $(this).prevAll().addClass('rating-chosen');
+                $(this).nextAll().removeClass('rating-chosen');
+            });
+        });
+    </script>
+</body>
+</html>
